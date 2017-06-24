@@ -1,24 +1,47 @@
 module Main exposing (..)
 
 import Html exposing (Html, text, div, input, button, ul, li, span)
-import Html.Attributes exposing (value, class)
+import Html.Attributes exposing (value, class, autofocus)
 import Html.Events exposing (onInput, onClick)
 
 
 view : Model -> Html Msg
 view model =
-    div [ class "text-center" ]
-        [ input [ onInput UpdateText, value model.text ] []
-        , button [ onClick AddTodo, class "btn btn-primary" ] [ text "Add" ]
-        , ul [] (List.indexedMap itemView model.todos)
+    div [ class "col-12 col-sm-6 offset-sm-3" ]
+        [ div [ class "row" ]
+            [ div [ class "col-9" ]
+                [ input
+                    [ class "form-control"
+                    , onInput UpdateText
+                    , value model.text
+                    , autofocus True
+                    ]
+                    []
+                ]
+            , div [ class "col-3" ]
+                [ button
+                    [ class "btn btn-primary form-control"
+                    , onClick AddTodo
+                    ]
+                    [ text "+" ]
+                ]
+            ]
+        , div [ class "row" ]
+            [ ul [ class "col-12" ] (List.indexedMap itemView model.todos) ]
         ]
 
 
 itemView : Int -> String -> Html Msg
 itemView index todo =
-    li []
-        [ text todo
-        , span [ onClick (RemoveTodo index) ] [ text " X" ]
+    li [ class "card" ]
+        [ div [ class "card-block" ]
+            [ text todo
+            , span
+                [ onClick (RemoveTodo index)
+                , class "float-right"
+                ]
+                [ text "✖️" ]
+            ]
         ]
 
 
