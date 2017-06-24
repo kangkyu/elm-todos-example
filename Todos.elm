@@ -1,14 +1,14 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, input, button, ul, li, span)
+import Html exposing (Html, text, div, input, button, ul, li, span, form)
 import Html.Attributes exposing (value, class, autofocus)
-import Html.Events exposing (onInput, onClick)
+import Html.Events exposing (onInput, onClick, onSubmit)
 
 
 view : Model -> Html Msg
 view model =
     div [ class "col-12 col-sm-6 offset-sm-3" ]
-        [ div [ class "row" ]
+        [ form [ class "row", onSubmit AddTodo ]
             [ div [ class "col-9" ]
                 [ input
                     [ class "form-control"
@@ -20,9 +20,7 @@ view model =
                 ]
             , div [ class "col-3" ]
                 [ button
-                    [ class "btn btn-primary form-control"
-                    , onClick AddTodo
-                    ]
+                    [ class "btn btn-primary form-control" ]
                     [ text "+" ]
                 ]
             ]
