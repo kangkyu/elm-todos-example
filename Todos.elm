@@ -118,13 +118,13 @@ update msg model =
                 ( { model | editing = Nothing, todos = newTodos }, Cmd.none )
 
 
-main : Program Never Model Msg
+main : Program Flags Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { view = view
-        , init = init
         , update = update
         , subscriptions = subscriptions
+        , init = init
         }
 
 
@@ -133,8 +133,12 @@ subscriptions model =
     Sub.none
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( Model "" [ "Laundry", "Dishes" ] Nothing
+type alias Flags =
+    { todos : List String }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    ( Model "" flags.todos Nothing
     , Cmd.none
     )
