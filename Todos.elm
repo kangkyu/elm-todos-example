@@ -135,4 +135,6 @@ subscriptions model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { text = "", todos = [ "Laundry", "Dishes" ], editing = Nothing }, Cmd.none )
+    ( Model "" [ "Laundry", "Dishes" ] Nothing
+    , Cmd.none
+    )
