@@ -7,14 +7,18 @@
 </head>
 <body>
   <script>
-    var isArrayOfStrings = function(array) {
-      return Array.isArray(array) && array.every(function(element) {
-        return typeof element === 'string';
+    var isTodos = function(array) {
+      return Array.isArray(array) && array.every(function(todo) {
+        return (
+          !!todo &&
+          typeof todo.content === 'string' &&
+          typeof todo.completed === 'boolean'
+        );
       });
     };
     var getTodos = function() {
       var todos = JSON.parse(localStorage.todos || '[]') || []
-      return isArrayOfStrings(todos) ? todos : [];
+      return isTodos(todos) ? todos : [];
     };
     var app = Elm.Main.fullscreen({
       todos: getTodos()

@@ -34,7 +34,7 @@ todoForm model =
         ]
 
 
-viewTodo : Maybe TodoEdit -> Int -> String -> Html Msg
+viewTodo : Maybe TodoEdit -> Int -> Todo -> Html Msg
 viewTodo editing index todo =
     case editing of
         Just todoEdit ->
@@ -63,12 +63,12 @@ viewEditTodo todoEdit =
         ]
 
 
-viewNormalTodo : Int -> String -> Html Msg
+viewNormalTodo : Int -> Todo -> Html Msg
 viewNormalTodo index todo =
     div [ class "card" ]
         [ div [ class "card-block" ]
-            [ span [ onDoubleClick (Edit index todo) ]
-                [ text todo ]
+            [ span [ onDoubleClick (Edit index todo.content) ]
+                [ text todo.content ]
             , span
                 [ onClick (RemoveTodo index)
                 , class "float-right"
@@ -79,7 +79,10 @@ viewNormalTodo index todo =
 
 
 type alias Model =
-    { text : String, todos : List String, editing : Maybe TodoEdit }
+    { text : String
+    , todos : List Todo
+    , editing : Maybe TodoEdit
+    }
 
 
 type alias TodoEdit =
@@ -103,7 +106,7 @@ update msg model =
         AddTodo ->
             let
                 newTodos =
-                    model.text :: model.todos
+                    Todo model.text False :: model.todos
             in
                 ( { model | text = "", todos = newTodos }, saveTodos newTodos )
 
@@ -123,7 +126,7 @@ update msg model =
                     List.indexedMap
                         (\i todo ->
                             if i == todoEdit.id then
-                                todoEdit.text
+                                { todo | content = todoEdit.text }
                             else
                                 todo
                         )
@@ -148,7 +151,7 @@ subscriptions model =
 
 
 type alias Flags =
-    { todos : List String }
+    { todos : List Todo }
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -162,4 +165,10 @@ init flags =
 -- port declaration
 
 
-port saveTodos : List String -> Cmd msg
+port saveTodos : List Todo -> Cmd msg
+
+
+type alias Todo =
+    { content : String
+    , completed : Bool
+    }
