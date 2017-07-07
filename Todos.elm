@@ -1,7 +1,7 @@
 port module Main exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (value, class, autofocus, placeholder, type_, checked)
+import Html.Attributes exposing (value, class, autofocus, placeholder, type_, checked, style)
 import Html.Events exposing (onInput, onClick, onSubmit, onDoubleClick)
 
 
@@ -77,7 +77,17 @@ viewNormalTodo index todo =
                 , onClick (ToggleTodo index)
                 ]
                 []
-            , span [ onDoubleClick (Edit index todo.content) ]
+            , span
+                [ onDoubleClick (Edit index todo.content)
+                , style
+                    [ ( "text-decoration"
+                      , if todo.completed then
+                            "line-through"
+                        else
+                            "none"
+                      )
+                    ]
+                ]
                 [ text todo.content ]
             , span
                 [ onClick (RemoveTodo index)
