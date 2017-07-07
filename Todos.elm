@@ -8,24 +8,29 @@ import Html.Events exposing (onInput, onClick, onSubmit, onDoubleClick)
 view : Model -> Html Msg
 view model =
     div [ class "col-12 col-sm-6 offset-sm-3" ]
-        [ form [ class "row", onSubmit AddTodo ]
-            [ div [ class "col-9" ]
-                [ input
-                    [ class "form-control"
-                    , onInput UpdateText
-                    , value model.text
-                    , autofocus True
-                    , placeholder "Enter a todo"
-                    ]
-                    []
-                ]
-            , div [ class "col-3" ]
-                [ button
-                    [ class "btn btn-primary form-control" ]
-                    [ text "+" ]
-                ]
-            ]
+        [ todoForm model
         , div [] (List.indexedMap (viewTodo model.editing) model.todos)
+        ]
+
+
+todoForm : Model -> Html Msg
+todoForm model =
+    form [ class "row", onSubmit AddTodo ]
+        [ div [ class "col-9" ]
+            [ input
+                [ class "form-control"
+                , onInput UpdateText
+                , value model.text
+                , autofocus True
+                , placeholder "Enter a todo"
+                ]
+                []
+            ]
+        , div [ class "col-3" ]
+            [ button
+                [ class "btn btn-primary form-control" ]
+                [ text "+" ]
+            ]
         ]
 
 
@@ -34,23 +39,28 @@ viewTodo editing index todo =
     case editing of
         Just todoEdit ->
             if todoEdit.id == index then
-                div [ class "card" ]
-                    [ div [ class "card-block" ]
-                        [ form [ onSubmit (EditSave todoEdit) ]
-                            [ input
-                                [ class "form-control"
-                                , onInput (Edit index)
-                                , value todoEdit.text
-                                ]
-                                []
-                            ]
-                        ]
-                    ]
+                viewEditTodo todoEdit
             else
                 viewNormalTodo index todo
 
         Nothing ->
             viewNormalTodo index todo
+
+
+viewEditTodo : TodoEdit -> Html Msg
+viewEditTodo todoEdit =
+    div [ class "card" ]
+        [ div [ class "card-block" ]
+            [ form [ onSubmit (EditSave todoEdit) ]
+                [ input
+                    [ class "form-control"
+                    , onInput (Edit todoEdit.id)
+                    , value todoEdit.text
+                    ]
+                    []
+                ]
+            ]
+        ]
 
 
 viewNormalTodo : Int -> String -> Html Msg
