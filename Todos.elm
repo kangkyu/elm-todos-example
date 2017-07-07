@@ -1,8 +1,11 @@
 port module Main exposing (..)
 
-import Html exposing (Html, text, div, input, button, ul, li, span, form)
+import Html exposing (..)
 import Html.Attributes exposing (value, class, autofocus, placeholder)
 import Html.Events exposing (onInput, onClick, onSubmit, onDoubleClick)
+
+
+-- view
 
 
 view : Model -> Html Msg
@@ -78,6 +81,10 @@ viewNormalTodo index todo =
         ]
 
 
+
+-- model
+
+
 type alias Model =
     { text : String
     , todos : List Todo
@@ -87,6 +94,16 @@ type alias Model =
 
 type alias TodoEdit =
     { id : Int, text : String }
+
+
+type alias Todo =
+    { content : String
+    , completed : Bool
+    }
+
+
+
+-- update
 
 
 type Msg
@@ -135,23 +152,16 @@ update msg model =
                 ( { model | editing = Nothing, todos = newTodos }, saveTodos newTodos )
 
 
-main : Program Flags Model Msg
-main =
-    Html.programWithFlags
-        { view = view
-        , update = update
-        , subscriptions = subscriptions
-        , init = init
-        }
+
+-- port declaration
+-- (commands)
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
+port saveTodos : List Todo -> Cmd msg
 
 
-type alias Flags =
-    { todos : List Todo }
+
+-- init
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -161,14 +171,24 @@ init flags =
     )
 
 
-
--- port declaration
-
-
-port saveTodos : List Todo -> Cmd msg
+type alias Flags =
+    { todos : List Todo }
 
 
-type alias Todo =
-    { content : String
-    , completed : Bool
-    }
+
+-- subscriptions
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+
+main : Program Flags Model Msg
+main =
+    programWithFlags
+        { view = view
+        , update = update
+        , init = init
+        , subscriptions = subscriptions
+        }
