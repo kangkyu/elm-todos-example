@@ -1,7 +1,7 @@
 port module Main exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (value, class, autofocus, placeholder)
+import Html.Attributes exposing (value, class, autofocus, placeholder, type_, checked)
 import Html.Events exposing (onInput, onClick, onSubmit, onDoubleClick)
 
 
@@ -70,7 +70,14 @@ viewNormalTodo : Int -> Todo -> Html Msg
 viewNormalTodo index todo =
     div [ class "card" ]
         [ div [ class "card-block" ]
-            [ span [ onDoubleClick (Edit index todo.content) ]
+            [ input
+                [ class "mr-3"
+                , type_ "checkbox"
+                , checked todo.completed
+                , onClick (ToggleTodo index)
+                ]
+                []
+            , span [ onDoubleClick (Edit index todo.content) ]
                 [ text todo.content ]
             , span
                 [ onClick (RemoveTodo index)
@@ -112,6 +119,7 @@ type Msg
     | RemoveTodo Int
     | Edit Int String
     | EditSave TodoEdit
+    | ToggleTodo Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -150,6 +158,20 @@ update msg model =
                         model.todos
             in
                 ( { model | editing = Nothing, todos = newTodos }, saveTodos newTodos )
+
+        ToggleTodo index ->
+            let
+                newTodos =
+                    List.indexedMap
+                        (\i todo ->
+                            if i == index then
+                                { todo | completed = not todo.completed }
+                            else
+                                todo
+                        )
+                        model.todos
+            in
+                ( { model | todos = newTodos }, saveTodos newTodos )
 
 
 
