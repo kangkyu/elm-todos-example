@@ -19,6 +19,10 @@
     var app = Elm.Main.fullscreen({
       todos: getTodos()
     });
+
+    app.ports.saveTodos.subscribe(function(todos) {
+      localStorage.todos = JSON.stringify(todos);
+    })
   </script>
 </body>
 </html>

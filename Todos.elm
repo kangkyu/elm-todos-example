@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Html exposing (Html, text, div, input, button, ul, li, span, form)
 import Html.Attributes exposing (value, class, autofocus, placeholder)
@@ -91,14 +91,18 @@ update msg model =
             ( { model | text = newText }, Cmd.none )
 
         AddTodo ->
-            ( { model | text = "", todos = model.text :: model.todos }, Cmd.none )
+            let
+                newTodos =
+                    model.text :: model.todos
+            in
+                ( { model | text = "", todos = newTodos }, saveTodos newTodos )
 
         RemoveTodo index ->
             let
                 newTodos =
                     (List.take index model.todos) ++ (List.drop (index + 1) model.todos)
             in
-                ( { model | todos = newTodos }, Cmd.none )
+                ( { model | todos = newTodos }, saveTodos newTodos )
 
         Edit index todoText ->
             ( { model | editing = Just { id = index, text = todoText } }, Cmd.none )
@@ -115,7 +119,7 @@ update msg model =
                         )
                         model.todos
             in
-                ( { model | editing = Nothing, todos = newTodos }, Cmd.none )
+                ( { model | editing = Nothing, todos = newTodos }, saveTodos newTodos )
 
 
 main : Program Flags Model Msg
@@ -142,3 +146,10 @@ init flags =
     ( Model "" flags.todos Nothing
     , Cmd.none
     )
+
+
+
+-- port declaration
+
+
+port saveTodos : List String -> Cmd msg
