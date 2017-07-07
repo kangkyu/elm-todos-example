@@ -84,24 +84,24 @@ type Msg
     | EditSave TodoEdit
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         UpdateText newText ->
-            { model | text = newText }
+            ( { model | text = newText }, Cmd.none )
 
         AddTodo ->
-            { model | text = "", todos = model.text :: model.todos }
+            ( { model | text = "", todos = model.text :: model.todos }, Cmd.none )
 
         RemoveTodo index ->
             let
                 newTodos =
                     (List.take index model.todos) ++ (List.drop (index + 1) model.todos)
             in
-                { model | todos = newTodos }
+                ( { model | todos = newTodos }, Cmd.none )
 
         Edit index todoText ->
-            { model | editing = Just { id = index, text = todoText } }
+            ( { model | editing = Just { id = index, text = todoText } }, Cmd.none )
 
         EditSave todoEdit ->
             let
@@ -115,18 +115,24 @@ update msg model =
                         )
                         model.todos
             in
-                { model | editing = Nothing, todos = newTodos }
+                ( { model | editing = Nothing, todos = newTodos }, Cmd.none )
 
 
 main : Program Never Model Msg
 main =
-    Html.beginnerProgram
+    Html.program
         { view = view
-        , model = initModel
+        , init = init
         , update = update
+        , subscriptions = subscriptions
         }
 
 
-initModel : Model
-initModel =
-    { text = "", todos = [ "Laundry", "Dishes" ], editing = Nothing }
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+
+init : ( Model, Cmd Msg )
+init =
+    ( { text = "", todos = [ "Laundry", "Dishes" ], editing = Nothing }, Cmd.none )
