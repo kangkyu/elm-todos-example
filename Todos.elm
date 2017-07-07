@@ -1,8 +1,8 @@
 module Main exposing (..)
 
 import Html exposing (Html, text, div, input, button, ul, li, span, form)
-import Html.Attributes exposing (value, class, autofocus)
-import Html.Events exposing (onInput, onClick, onSubmit)
+import Html.Attributes exposing (value, class, autofocus, placeholder)
+import Html.Events exposing (onInput, onClick, onSubmit, onDoubleClick)
 
 
 view : Model -> Html Msg
@@ -15,6 +15,7 @@ view model =
                     , onInput UpdateText
                     , value model.text
                     , autofocus True
+                    , placeholder "Enter a todo"
                     ]
                     []
                 ]
@@ -24,16 +25,40 @@ view model =
                     [ text "+" ]
                 ]
             ]
-        , div [ class "row" ]
-            [ ul [ class "col-12" ] (List.indexedMap itemView model.todos) ]
+        , div [] (List.indexedMap (viewTodo model.editing) model.todos)
         ]
 
 
-itemView : Int -> String -> Html Msg
-itemView index todo =
-    li [ class "card" ]
+viewTodo : Maybe TodoEdit -> Int -> String -> Html Msg
+viewTodo editing index todo =
+    case editing of
+        Just todoEdit ->
+            if todoEdit.id == index then
+                div [ class "card" ]
+                    [ div [ class "card-block" ]
+                        [ form [ onSubmit (EditSave todoEdit) ]
+                            [ input
+                                [ class "form-control"
+                                , onInput (Edit index)
+                                , value todoEdit.text
+                                ]
+                                []
+                            ]
+                        ]
+                    ]
+            else
+                viewNormalTodo index todo
+
+        Nothing ->
+            viewNormalTodo index todo
+
+
+viewNormalTodo : Int -> String -> Html Msg
+viewNormalTodo index todo =
+    div [ class "card" ]
         [ div [ class "card-block" ]
-            [ text todo
+            [ span [ onDoubleClick (Edit index todo) ]
+                [ text todo ]
             , span
                 [ onClick (RemoveTodo index)
                 , class "float-right"
@@ -44,13 +69,19 @@ itemView index todo =
 
 
 type alias Model =
-    { text : String, todos : List String }
+    { text : String, todos : List String, editing : Maybe TodoEdit }
+
+
+type alias TodoEdit =
+    { id : Int, text : String }
 
 
 type Msg
     = UpdateText String
     | AddTodo
     | RemoveTodo Int
+    | Edit Int String
+    | EditSave TodoEdit
 
 
 update : Msg -> Model -> Model
@@ -69,11 +100,33 @@ update msg model =
             in
                 { model | todos = newTodos }
 
+        Edit index todoText ->
+            { model | editing = Just { id = index, text = todoText } }
+
+        EditSave todoEdit ->
+            let
+                newTodos =
+                    List.indexedMap
+                        (\i todo ->
+                            if i == todoEdit.id then
+                                todoEdit.text
+                            else
+                                todo
+                        )
+                        model.todos
+            in
+                { model | editing = Nothing, todos = newTodos }
+
 
 main : Program Never Model Msg
 main =
     Html.beginnerProgram
         { view = view
-        , model = { text = "", todos = [] }
+        , model = initModel
         , update = update
         }
+
+
+initModel : Model
+initModel =
+    { text = "", todos = [ "Laundry", "Dishes" ], editing = Nothing }
